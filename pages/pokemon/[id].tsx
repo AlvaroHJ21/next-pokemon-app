@@ -23,11 +23,11 @@ export default function PokemonPage({ pokemon }: Props) {
 
         if (isFavorite) return;
         confetti({
-            zIndex:999,
+            zIndex: 999,
             particleCount: 100,
             spread: 168,
             angle: -100,
-            origin: { x: 1, y: 0},
+            origin: { x: 1, y: 0 },
         });
     };
 
@@ -119,17 +119,28 @@ export const getStaticPaths: GetStaticPaths = async (ctx) => {
 
     return {
         paths,
-        fallback: false,
+        fallback: 'blocking',
     };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-
     const { id } = params as { id: string };
+
+    const pokemon = await getPokemonInfo(id);
+
+    if (!pokemon) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false,
+            },
+        };
+    }
 
     return {
         props: {
-            pokemon: await getPokemonInfo(id),
+            pokemon,
         },
+        revalidate: 86400,
     };
 };
